@@ -97,3 +97,18 @@ print(f"Files created:")
 print(f"  - 02_data/baseline_metrics.csv ({len(baseline_df)} records)")
 print(f"  - 02_data/year1_metrics.csv ({len(year1_df)} records)")
 print(f"  - 02_data/all_metrics.csv ({len(all_metrics)} records)")
+
+# Merge with branches to compare groups for testing data
+test = year1_df.merge(df[['branch_code', 'study_group']], on='branch_code')
+# comparing pass percentage
+print (f'\n\nPass Percentage Comparison\n ={"="*30}')
+print(test.groupby('study_group')['pass_percentage'].mean())
+# comparing new enrollments
+print(f'\nNew Enrollment Comparison\n {"="*30}')
+print(test.groupby('study_group')['new_enrollments'].mean())
+# comparing revenue
+print(f'\nRevenue Comparison\n {"="*30}')
+print(test.groupby('study_group')['revenue'].mean())
+#comparing cleanliness score
+print(f'\nCleanliness Score Comparison\n {"="*30}')
+print(test.groupby('study_group')['cleanliness_score'].mean())
