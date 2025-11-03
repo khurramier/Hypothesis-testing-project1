@@ -1,6 +1,6 @@
 import sqlite3 
 import pandas as pd
-import os
+
 # Create header
 print("="*60)
 print("CREATING SQLITE DATABASE")
@@ -33,7 +33,6 @@ print('Branches Table\n')
 sample_branches = pd.read_sql("SELECT * FROM branches LIMIT 5", conn)
 print(sample_branches)
 print('\nPerformance Metrics Table\n')
-# fixed SQL: SELECT * FROM <table> LIMIT <n>
 sample_metrics = pd.read_sql('SELECT * FROM metrics LIMIT 5', conn)
 print(sample_metrics)
 # Commit (not strictly necessary for reads, but good practice) and close connection
