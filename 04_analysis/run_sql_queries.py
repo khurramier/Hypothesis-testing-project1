@@ -100,9 +100,9 @@ WHERE measurement_period = 'year 1'
 SELECT 
     b.branch_code,
     b.study_group,
-    (y1_pass - base_pass) AS pass_improvement,
-    ROUND((y1_enroll - base_enroll)/base_enroll * 100 ,2) AS enrollment_growth,
-    ROUND((y1_revenue-base_revenue)/base_revenue * 100,2) AS revenue_growth,
+    (y.y1_pass - bl.base_pass) AS pass_improvement,
+    ROUND(CAST((y.y1_enroll - bl.base_enroll) AS FLOAT) * 100.0 / bl.base_enroll, 2) AS enrollment_growth,
+    ROUND((y.y1_revenue - bl.base_revenue) * 100.0 / bl.base_revenue, 2) AS revenue_growth,
     (y1_cleanliness- base_cleanliness) AS cleanliness_improvement
 FROM branches AS b
 JOIN baseline As bl ON b.branch_code = bl.branch_code
@@ -110,13 +110,13 @@ JOIN year1 As y ON b.branch_code = y.branch_code
 WHERE b.study_group IN ('experimental', 'control')
 """
 
-improvements_df = pd.read_sql(query4, conn)
-print(f"Calculated improvements for {len(improvements_df)} branches")
+result4 = pd.read_sql(query4, conn)
+print(f"Calculated improvements for {len(result4)} branches")
 print("\nSample improvements:")
-print(improvements_df.head(10))
+print(result4.head(10))
 
 # Save improvements to CSV for next step
-improvements_df.to_csv('02_data/improvements.csv', index=False)
+result4.to_csv('02_data/improvements.csv', index=False)
 print(f"\n Saved to: 02_data/improvements.csv")
 
 # ===== QUERY 5: Average Improvements by Group =====
@@ -150,15 +150,22 @@ WHERE measurement_period = 'year 1'
 SELECT 
     b.study_group,
     COUNT(*) AS n_branches,
-    (y1_pass - base_pass) AS pass_improvement,
-    ROUND((y1_enroll - base_enroll)/base_enroll * 100 ,2) AS enrollment_growth,
-    ROUND((y1_revenue-base_revenue)/base_revenue * 100,2) AS revenue_growth,
-    (y1_cleanliness- base_cleanliness) AS cleanliness_improvement
+    (y.y1_pass - bl.base_pass) AS pass_improvement,
+    ROUND(CAST((y.y1_enroll - bl.base_enroll) AS FLOAT) * 100.0 / bl.base_enroll, 2) AS enrollment_growth,
+    ROUND((y.y1_revenue - bl.base_revenue) * 100.0 / bl.base_revenue, 2) AS revenue_growth,
+    (y.y1_cleanliness - bl.base_cleanliness) AS cleanliness_improvement
 FROM branches AS b
 JOIN baseline As bl ON b.branch_code = bl.branch_code
 JOIN year1 As y ON b.branch_code = y.branch_code
 WHERE b.study_group IN ('experimental', 'control')
 GROUP BY b.study_group
 """
-result4 = pd.read_sql(query5, conn)
-print(result4)
+result5 = pd.read_sql(query5, conn)
+print(result5)
+
+#close database connection
+conn.close()
+
+print(f'\n\n{'*' * 70}\n')
+print(f'SQl Analysis Completed')
+print(f'\n{'*' * 70}\n')
